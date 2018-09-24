@@ -3,7 +3,7 @@
 #include "headers/pid.h"
 #include "headers/fileio.h"
 
-/* Analize the arguments. */
+/* Analize the arguments.- */
 void cli(int, char *[]);
 
 /* This var is to know the total of PID admitted. */
