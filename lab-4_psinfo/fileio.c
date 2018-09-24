@@ -37,9 +37,9 @@ char *create_full_name(int argc, char *argv[]) {
     return full_name;
 }
 
-FILE *open_proc_pid(PID_INFO pid) {
+FILE *open_proc_folder(char *p_id) {
     /* The array contains the full path separated */
-    char *path[3] = {"/proc/", pid.p_id, "/status"};
+    char *path[3] = {"/proc/", p_id, "/status"};
     char *full_path = create_full_name(3, path);
 
     /* Open the file to read */

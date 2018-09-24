@@ -14,7 +14,7 @@
  * Write a file
 */
 
-FILE *open_proc_pid(PID_INFO);
+FILE *open_proc_folder(char*);
 void create_file(int, PID_INFO []);
 
 

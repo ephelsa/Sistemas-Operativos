@@ -1,6 +1,8 @@
 #ifndef PID_H_
 #define PID_H_
 
+#include <stdio.h>
+#include <stdlib.h>
 /**
  * Struct type PID_INFO will contains:
  * pid
@@ -31,6 +33,8 @@ typedef struct pid_info {
  * Methods
 */
 
-PID_INFO* read_all_pid(int, PID_INFO[]);
+PID_INFO* read_all_pid(int, char*[]);
+
+unsigned short validate_pid(char*);
 
 #endif
