@@ -5,8 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "pid.h"
-
 /**
  * Methods
  * 
@@ -15,7 +13,7 @@
 */
 
 FILE *open_proc_folder(char*);
-void create_file(int, PID_INFO []);
+void create_file(int,char *[]);
 
 
 #endif

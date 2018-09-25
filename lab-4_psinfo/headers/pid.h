@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 /**
  * Struct type PID_INFO will contains:
  * pid
@@ -33,7 +34,7 @@ typedef struct pid_info {
  * Methods
 */
 
-PID_INFO* read_all_pid(int, char*[]);
+void fill_pids_information(int, PID_INFO *);
 
 unsigned short validate_pid(char*);
 

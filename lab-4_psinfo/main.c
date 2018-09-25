@@ -3,51 +3,54 @@
 #include "headers/pid.h"
 #include "headers/fileio.h"
 
-/* Analize the arguments.- */
-void cli(int, char *[], PID_INFO *);
+/* Analize the arguments. */
+void cli(int, char *[]);
+
+/* This method extract the PIDs from the arguments */
+void set_pids(int, char *[], PID_INFO *);
 
 /* This var is to know the total of PID admitted. */
 int number_pid = 0;
+unsigned short report = 0;  // Values 0 and 1.
+unsigned short list = 0;    // Values 0 and 1.
 
 /* Main code */
 int main(int argc, char *argv[]) {
 
+    /* Minimun arguments */
     if (argc < 2) {
         printf("Usage: %s -<options> [pid's]\n", argv[0]);
         printf("<options>\n r: Create a report.\n l: List PID.\n");
         exit(1);
-    } else {
-        PID_INFO pids[2];
-        pids[0].p_id = "2";
-        cli(argc, argv, pids);
+    } else 
+        cli(argc, argv);
 
-        printf("PID: %s\n", pids[0].p_id);
-    }
+    printf("PID'S numbers: %d\n", number_pid);
 
+    /* After known the number of pids, is time to allocate in memory the PIDS */
+    PID_INFO *pids_info = malloc(number_pid * sizeof(PID_INFO));
+    
+    set_pids(argc, argv, pids_info);
+
+    fill_pids_information(number_pid, pids_info);
 
 
     return 0;
 }
 
 
-void cli(int argc, char *args[], PID_INFO *pids) {
+void cli(int argc, char *args[]) {
     /* Read the arguments */
     /* These vars are to validate if special command has found */
     int command_pos = -1;
     unsigned short command = 00;    // Values 00 before read the dash pos, 01 reading commands, 11 dash detected or not.
-    unsigned short report = 0;  // Values 0 and 1.
-    unsigned short list = 0;    // Values 0 and 1.
 
     /* To know the number of PIDs */
     number_pid = argc - 1;
 
-    /* To know when the pids size has been allocated in memory. Values between 0 and 1. */
-    unsigned short pid_allocated = 0;
-
     for (int i = 1; i < argc; i++) {
-
         /* First if: To no iterate char by char if the command has been read. */
-        /* The else contains the PIDs */
+        /* The else is to end */
         if (command != 11) {
             /* To read char by char */
             char ch;
@@ -129,32 +132,35 @@ void cli(int argc, char *args[], PID_INFO *pids) {
                 exit(1);
             }
         } else {
-            // Document this
-            unsigned short a = validate_pid(args[i]);
 
-            if (pid_allocated == 0) {
-                pids = calloc(number_pid, sizeof(PID_INFO));
-
-                if (pids == NULL) {
-                    printf("Error: Allocating PIDS in memory didn't work.\n");
-                    exit(1);
-                } else {
-                    pid_allocated = 1;
-                }
-            } 
-            
-            if (pid_allocated == 1 && a == 1) {
-                if ((argc - number_pid) == 1) {
-                    pids[number_pid - i].p_id = args[i];
-
-                    printf("W op %s\n", pids[number_pid - i].p_id);
-                } else {
-                    pids[number_pid - (i - 1)].p_id = args[i];     
-                    printf("Op %s\n", pids[number_pid - (i - 1)].p_id);
-                }
-            }
+            break;
         }
     }
+}
 
-    printf("PID'S numbers: %d\n", number_pid);
+void set_pids(int argc, char *argv[], PID_INFO *pids) {
+    int diff = argc - number_pid;
+    unsigned short have_commands = 1;
+    
+    /* This is to know when we have the list command */
+    int condition = argc;
+
+    printf("Diff %d\n", diff);
+
+    /** If the difference between argc (total of arguments) - number_pid is equals to 1, it's say that 
+     * we don't have <options>.
+    */
+    if (diff == 1)
+        have_commands = 0;
+
+    /* The for's inside the statement append the PIDs inverse. */
+    /* Example: ./a 123 456 789 <- input */
+    /*          789 456 123 <- saved inverse */
+    if (have_commands == 1) {
+        for (int i = 2; i < condition; i++) 
+            pids[number_pid - (i - 1)].p_id = argv[i];
+    } else {
+        for (int i = 1; i < condition; i++) 
+            pids[number_pid - i].p_id = argv[i];
+    }
 }

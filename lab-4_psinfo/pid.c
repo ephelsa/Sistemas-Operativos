@@ -1,7 +1,23 @@
 #include "headers/pid.h"
+#include "headers/fileio.h"
 
-PID_INFO* read_all_pid(int size, char *pid[]) {
-    PID_INFO* pid_array;
+
+/** This method fille the PIDS struct with the complete information. */
+void fill_pids_information(int size, PID_INFO *pids) {
+
+    for (int i = 0; i < size; i++) {
+        printf("PID.c: %s\n", pids[i].p_id);
+
+
+        FILE *proc = open_proc_folder(pids[i].p_id);
+        
+        char line[120];
+
+        for (int j = 0; fgets(line, sizeof(line), proc) != NULL; j++) {
+            printf("Line [%02d][%02d]: %s", i, j, line);
+        }
+
+    }
 }
 
 /* This method validate if is a number. */

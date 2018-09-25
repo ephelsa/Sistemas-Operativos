@@ -49,7 +49,7 @@ FILE *open_proc_folder(char *p_id) {
 
     /* Validate if the file is valid */
     if (inFile == NULL) {
-        printf("Error to open %s, invalid file...", full_path);
+        printf("Error to open %s, invalid file...\n", full_path);
 
         exit(1);
     }
@@ -57,7 +57,7 @@ FILE *open_proc_folder(char *p_id) {
     return inFile;
 }
 
-void create_file(int pid_array_size, PID_INFO pids[]) {
+void create_file(int pid_array_size, char *pids[]) {
     /* 1 (psinfo-report-) + pid_array_size (1029, 1204) + pid_array_size - 1 (dashes) = pid_array_size * 2 */
     int full_name_len = (pid_array_size * 2) + 1;
     char **name = calloc(full_name_len, sizeof(char *));
@@ -82,7 +82,7 @@ void create_file(int pid_array_size, PID_INFO pids[]) {
         }
 
         /* To add the pid number */
-        name[i] = pids[pos].p_id;
+        name[i] = pids[pos];
     }
 
     /* The file creation */
