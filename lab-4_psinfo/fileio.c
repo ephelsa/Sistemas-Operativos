@@ -23,6 +23,7 @@ char *create_full_name(int argc, char *argv[]) {
     /* Separate memory space */
     full_name = malloc(full_name_len);
 
+    /* full name positions */
     int counter = 0;
 
     /* Write the full name */
@@ -80,10 +81,14 @@ void create_file(int pid_array_size, PID_INFO pids[]) {
             continue;
         }
 
+        /* To add the pid number */
         name[i] = pids[pos].p_id;
     }
 
     /* The file creation */
     FILE *outFile = fopen(create_full_name(full_name_len, name), "wa");
     fclose(outFile);
+
+    /* To deallocate block of memory */
+    free(name);
 }
