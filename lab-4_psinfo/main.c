@@ -16,7 +16,6 @@ unsigned short list = 0;    // Values 0 and 1.
 
 /* Main code */
 int main(int argc, char *argv[]) {
-
     /* Minimun arguments */
     if (argc < 2) {
         printf("Usage: %s -<options> [pid's]\n", argv[0]);
@@ -30,9 +29,13 @@ int main(int argc, char *argv[]) {
     /* After known the number of pids, is time to allocate in memory the PIDS */
     PID_INFO *pids_info = malloc(number_pid * sizeof(PID_INFO));
     
+
     set_pids(argc, argv, pids_info);
 
     fill_pids_information(number_pid, pids_info);
+
+    printf("PID.main: \n%s%s\n", pids_info[0].name, pids_info[0].state);
+    printf("PID.main: \n%s%s\n", pids_info[1].name, pids_info[1].state);
 
 
     return 0;
@@ -132,7 +135,6 @@ void cli(int argc, char *args[]) {
                 exit(1);
             }
         } else {
-
             break;
         }
     }
@@ -150,17 +152,32 @@ void set_pids(int argc, char *argv[], PID_INFO *pids) {
     /** If the difference between argc (total of arguments) - number_pid is equals to 1, it's say that 
      * we don't have <options>.
     */
-    if (diff == 1)
+    if (diff == 1) {
         have_commands = 0;
+    } else {
+        /* This is to take only the first PID if the user didn't write -l command */
+        if (list == 0 && report == 1) {
+            condition = argc - (number_pid - 1);
+            number_pid = 1;
+        } else if (list == 0 && report == 0) {
+            condition = argc - number_pid;
+        }
+    }
+
+    printf("Condition: %d\n", condition);
 
     /* The for's inside the statement append the PIDs inverse. */
     /* Example: ./a 123 456 789 <- input */
     /*          789 456 123 <- saved inverse */
     if (have_commands == 1) {
-        for (int i = 2; i < condition; i++) 
-            pids[number_pid - (i - 1)].p_id = argv[i];
+        for (int i = 2; i < condition; i++) {
+            if (validate_pid(argv[i]) == 1)
+                pids[number_pid - (i - 1)].p_id = argv[i];
+        }
     } else {
-        for (int i = 1; i < condition; i++) 
-            pids[number_pid - i].p_id = argv[i];
+        for (int i = 1; i < condition; i++) {
+            if (validate_pid(argv[i]) == 1)
+                pids[number_pid - i].p_id = argv[i];
+        }
     }
 }

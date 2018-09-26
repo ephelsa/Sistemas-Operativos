@@ -5,18 +5,22 @@
 /** This method fille the PIDS struct with the complete information. */
 void fill_pids_information(int size, PID_INFO *pids) {
 
+    char line[56][120];
+
     for (int i = 0; i < size; i++) {
         printf("PID.c: %s\n", pids[i].p_id);
 
+        FILE *proc = open_proc_folder(pids[i].p_id);        
 
-        FILE *proc = open_proc_folder(pids[i].p_id);
-        
-        char line[120];
+        for (int j = 0; fgets(line[j], 120, proc) != NULL; j++) {
+            printf("Line [%02d][%02d]: %s\n", i, j, line[j]);
 
-        for (int j = 0; fgets(line, sizeof(line), proc) != NULL; j++) {
-            printf("Line [%02d][%02d]: %s", i, j, line);
         }
 
+        pids[i].name = line[0];
+        pids[i].state = line[2];
+
+        fclose(proc);
     }
 }
 
