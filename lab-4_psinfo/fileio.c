@@ -130,15 +130,3 @@ void create_file(int pid_array_size, PID_INFO *pids) {
     free(name);
     free(filename);
 }
-
-int total_lines_in_file(FILE *inFile, int size) {
-    char *line = malloc(size * sizeof(char));
-    int total = 0;
-
-    while (fgets(line, size, inFile) != NULL)
-        total++;
-
-    fclose(inFile);
-
-    return total;
-}

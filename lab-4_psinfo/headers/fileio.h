@@ -16,7 +16,6 @@
 
 FILE *open_proc_folder(char*);
 void create_file(int, PID_INFO *);
-int total_lines_in_file(FILE *, int);
 
 
 #endif

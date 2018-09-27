@@ -3,7 +3,9 @@
 #include <string.h>
 
 int total_char(char *, char, char);
+unsigned short chars_contained_in_title(char *, char *);
 char *separate_memory(int);
+
 
 
 int total_char(char *line, char start, char end) {
@@ -27,6 +29,19 @@ int total_char(char *line, char start, char end) {
     return total;
 }
 
+unsigned short chars_contained_in_title(char *line, char *chs) {
+    unsigned short contained = 0;
+
+    for (int i = 0; chs[i] != '\0'; i++) {
+        if (line[i] != chs[i])
+            return contained;
+    }
+    contained = 1;
+
+    return contained;
+}
+
+
 char *separate_memory(int size) {
     char *info = malloc(size * sizeof(char));
 
@@ -46,9 +61,7 @@ void fill_pids_information(int size, PID_INFO *pids) {
 
     for (int i = 0; i < size; i++) {
         FILE *proc = open_proc_folder(pids[i].p_id);   
-        int tlif = total_lines_in_file(proc, total_line);
 
-        proc = open_proc_folder(pids[i].p_id);   
         char *line = calloc(total_line, sizeof(line));
 
         for (int j = 0; fgets(line, total_line, proc) != NULL; j++) {
@@ -58,36 +71,29 @@ void fill_pids_information(int size, PID_INFO *pids) {
 
             char *title = malloc(title_size * sizeof(char));
 
-            if (j == 0) {
-                //pids[i].name = malloc(info_size * sizeof(char));
+
+            if (chars_contained_in_title(line, "Name:\0") == 1) {
                 pids[i].name = separate_memory(info_size);
                 sscanf(line, "%s %s", title, pids[i].name);
-            } else if (j == 2) {
-                //pids[i].state = malloc(info_size * sizeof(char));
+            } else if (chars_contained_in_title(line, "State:\0") == 1) {
                 pids[i].state = separate_memory(info_size);
                 sscanf(line, "%s %s", title, pids[i].state);
-            } else if (j == 17) {
-                //pids[i].vmSize = malloc(info_size * sizeof(char));
+            } else if (chars_contained_in_title(line, "VmSize:\0") == 1) {
                 pids[i].vmSize = separate_memory(info_size);
                 sscanf(line, "%s %s", title, pids[i].vmSize);
-            } else if (j == 27) {
-                //pids[i].vmExe = malloc(info_size * sizeof(char));
+            } else if (chars_contained_in_title(line, "VmExe:\0") == 1) {
                 pids[i].vmExe = separate_memory(info_size);
                 sscanf(line, "%s %s", title, pids[i].vmExe);
-            } else if (j == 25) {
-                //pids[i].vmData = malloc(info_size * sizeof(char));
+            } else if (chars_contained_in_title(line, "VmData:\0") == 1) {
                 pids[i].vmData = separate_memory(info_size);
                 sscanf(line, "%s %s", title, pids[i].vmData);
-            } else if (j == 26) {
-                //pids[i].vmStk = malloc(info_size * sizeof(char));
+            } else if (chars_contained_in_title(line, "VmStk:\0") == 1) {
                 pids[i].vmStk = separate_memory(info_size);
                 sscanf(line, "%s %s", title, pids[i].vmStk);
-            } else if (j == (tlif - 2)) {
-                //pids[i].voluntary_ctxt_switches = malloc(info_size * sizeof(char));
+            } else if (chars_contained_in_title(line, "voluntary_ctxt_switches:\0") == 1) {
                 pids[i].voluntary_ctxt_switches = separate_memory(info_size);
                 sscanf(line, "%s %s", title, pids[i].voluntary_ctxt_switches);
-            } else if (j == (tlif - 1)) {
-                //pids[i].novoluntary_ctxt_switches = malloc(info_size * sizeof(char));
+            } else if (chars_contained_in_title(line, "nonvoluntary_ctxt_switches:\0") == 1) {
                 pids[i].novoluntary_ctxt_switches = separate_memory(info_size);
                 sscanf(line, "%s %s", title, pids[i].novoluntary_ctxt_switches);
             }
