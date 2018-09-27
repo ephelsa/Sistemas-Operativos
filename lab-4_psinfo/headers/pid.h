@@ -36,6 +36,8 @@ typedef struct pid_info {
 
 void fill_pids_information(int, PID_INFO *);
 
+void liberate_pids_memory(PID_INFO *, int);
+
 unsigned short validate_pid(char*);
 
 #endif

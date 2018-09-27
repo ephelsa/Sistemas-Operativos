@@ -31,22 +31,29 @@ int main(int argc, char *argv[]) {
     set_pids(argc, argv, pids_info);
 
     fill_pids_information(number_pid, pids_info);
+    
+    if (list == 1 && report == 0)
+        printf("\n\n--- Informacion recolectada ---");
+
+    if (report == 0) {
+        for (int i = 0; i < number_pid; i++) {
+            printf("\nPID: %s\n", pids_info[i].p_id);
+            printf("Nombre del proceso: %s\n", pids_info[i].name);
+            printf("Estado: %s\n", pids_info[i].state);
+            printf("Tamaño total en memoria: %s\n", pids_info[i].vmSize);
+            printf("\tTamaño de la memoria en la región TEXT: %s\n", pids_info[i].vmExe);
+            printf("\tTamaño de la memoria en la región DATA: %s\n", pids_info[i].vmData);
+            printf("\tTamaño de la memoria en la región STACK: %s\n", pids_info[i].vmStk);
+            printf("\tNúmero de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n", pids_info[i].voluntary_ctxt_switches, pids_info[i].novoluntary_ctxt_switches);
+        }
+    }
+
+    if (report == 1)
+        create_file(number_pid, pids_info);
 
     
-    if (number_pid > 1)
-        printf("--- Informacion recolectada ---");
+    liberate_pids_memory(pids_info, number_pid);
 
-    for (int i = 0; i < number_pid; i++) {
-        printf("\nPID: %s\n", pids_info[i].p_id);
-        printf("Nombre del proceso: %s\n", pids_info[i].name);
-        printf("Estado: %s\n", pids_info[i].state);
-        printf("Tamaño total en memoria: %s\n", pids_info[i].vmSize);
-        printf("\tTamaño de la memoria en la región TEXT: %s\n", pids_info[i].vmExe);
-        printf("\tTamaño de la memoria en la región DATA: %s\n", pids_info[i].vmData);
-        printf("\tTamaño de la memoria en la región STACK: %s\n", pids_info[i].vmStk);
-        printf("\tNúmero de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n", pids_info[i].voluntary_ctxt_switches, pids_info[i].novoluntary_ctxt_switches);   
-
-    }
 
 
     return 0;
@@ -151,7 +158,6 @@ void set_pids(int argc, char *argv[], PID_INFO *pids) {
     
     /* This is to know when we have the list command */
     int condition = argc;
-    printf("ARGC: %d\n", condition);
 
     /** If the difference between argc (total of arguments) - number_pid is equals to 1, it's say that 
      * we don't have <options>.
@@ -164,8 +170,6 @@ void set_pids(int argc, char *argv[], PID_INFO *pids) {
             condition = argc - number_pid;
             number_pid = 1;
         }
-        printf("ARGC: %d\n", condition);
-
     } else {
         /* This is to take only the first PID if the user didn't write -l command */
         if (list == 0 && report == 1) {
