@@ -24,8 +24,6 @@ int main(int argc, char *argv[]) {
     } else 
         cli(argc, argv);
 
-    printf("PID'S numbers: %d\n", number_pid);
-
     /* After known the number of pids, is time to allocate in memory the PIDS */
     PID_INFO *pids_info = malloc(number_pid * sizeof(PID_INFO));
     
@@ -34,8 +32,21 @@ int main(int argc, char *argv[]) {
 
     fill_pids_information(number_pid, pids_info);
 
-    printf("PID.main: \n%s%s\n", pids_info[0].name, pids_info[0].state);
-    printf("PID.main: \n%s%s\n", pids_info[1].name, pids_info[1].state);
+    
+    if (number_pid > 1)
+        printf("--- Informacion recolectada ---");
+
+    for (int i = 0; i < number_pid; i++) {
+        printf("\nPID: %s\n", pids_info[i].p_id);
+        printf("Nombre del proceso: %s\n", pids_info[i].name);
+        printf("Estado: %s\n", pids_info[i].state);
+        printf("Tamaño total en memoria: %s\n", pids_info[i].vmSize);
+        printf("\tTamaño de la memoria en la región TEXT: %s\n", pids_info[i].vmExe);
+        printf("\tTamaño de la memoria en la región DATA: %s\n", pids_info[i].vmData);
+        printf("\tTamaño de la memoria en la región STACK: %s\n", pids_info[i].vmStk);
+        printf("\tNúmero de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n", pids_info[i].voluntary_ctxt_switches, pids_info[i].novoluntary_ctxt_switches);   
+
+    }
 
 
     return 0;
@@ -128,12 +139,6 @@ void cli(int argc, char *args[]) {
                 } 
             }
 
-            /* If has been detected "./filename -" an error is shown. */
-            if (total_j = 1 && argc == 2) {
-                printf("Usage: %s -<options> [pid's]\n", args[0]);
-                printf("<options>\n r: Create a report.\n l: List PID.\n");
-                exit(1);
-            }
         } else {
             break;
         }
@@ -146,14 +151,21 @@ void set_pids(int argc, char *argv[], PID_INFO *pids) {
     
     /* This is to know when we have the list command */
     int condition = argc;
-
-    printf("Diff %d\n", diff);
+    printf("ARGC: %d\n", condition);
 
     /** If the difference between argc (total of arguments) - number_pid is equals to 1, it's say that 
      * we don't have <options>.
     */
     if (diff == 1) {
         have_commands = 0;
+
+        if (number_pid > 1) {
+            /* This is to take only the first PID if the user didn't write -l command */
+            condition = argc - number_pid;
+            number_pid = 1;
+        }
+        printf("ARGC: %d\n", condition);
+
     } else {
         /* This is to take only the first PID if the user didn't write -l command */
         if (list == 0 && report == 1) {
@@ -161,10 +173,9 @@ void set_pids(int argc, char *argv[], PID_INFO *pids) {
             number_pid = 1;
         } else if (list == 0 && report == 0) {
             condition = argc - number_pid;
+            number_pid = 1;
         }
     }
-
-    printf("Condition: %d\n", condition);
 
     /* The for's inside the statement append the PIDs inverse. */
     /* Example: ./a 123 456 789 <- input */
@@ -175,9 +186,16 @@ void set_pids(int argc, char *argv[], PID_INFO *pids) {
                 pids[number_pid - (i - 1)].p_id = argv[i];
         }
     } else {
-        for (int i = 1; i < condition; i++) {
-            if (validate_pid(argv[i]) == 1)
-                pids[number_pid - i].p_id = argv[i];
+        /* This is to take only the first PID if the user didn't write -l command */
+        /* The else is to this example: ./a 1900 */
+        if (number_pid > 1) {
+            for (int i = 1; i < condition; i++) {
+                if (validate_pid(argv[i]) == 1)
+                    pids[number_pid - i].p_id = argv[i];
+            }
+        } else {
+            if (validate_pid(argv[1]) == 1)
+                pids[number_pid - 1].p_id = argv[1];
         }
     }
 }

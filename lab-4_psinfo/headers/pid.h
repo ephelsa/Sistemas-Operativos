@@ -18,15 +18,15 @@
 */
 
 typedef struct pid_info {
-    char *p_id;
-    char *name;
-    char *state;
-    char *vmSize;
-    char *vmExe;
-    char *vmData;
-    char *vmStk;
-    int voluntary_ctxt_switches;
-    int novoluntary_ctxt_switches;
+    char *p_id; // args
+    char *name; // 0
+    char *state;    // 2
+    char *vmSize;   // 17
+    char *vmExe;    // 27
+    char *vmData;   // 25
+    char *vmStk;    // 26
+    char *voluntary_ctxt_switches;    // total - 1
+    char *novoluntary_ctxt_switches;  // total
 } PID_INFO;
 
 

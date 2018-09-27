@@ -1,13 +1,16 @@
 #include "headers/fileio.h"
 
-/**
- * Private method declaration
-*/
+/******************************/
+/* Private method declaration */
+/******************************/
+
 char *create_full_name(int, char *[]);
 
-/**
- * Private method definition
-*/
+
+/*****************************/
+/* Private method definition */
+/*****************************/
+
 char *create_full_name(int argc, char *argv[]) {
     size_t names_len[argc];
     size_t full_name_len = 0;
@@ -37,6 +40,10 @@ char *create_full_name(int argc, char *argv[]) {
 
     return full_name;
 }
+
+/****************************/
+/* Public method definition */
+/****************************/
 
 FILE *open_proc_folder(char *p_id) {
     /* The array contains the full path separated */
@@ -91,4 +98,16 @@ void create_file(int pid_array_size, char *pids[]) {
 
     /* To deallocate block of memory */
     free(name);
+}
+
+int total_lines_in_file(FILE *inFile, int size) {
+    char *line = malloc(size * sizeof(char));
+    int total = 0;
+
+    while (fgets(line, size, inFile) != NULL)
+        total++;
+
+    fclose(inFile);
+
+    return total;
 }
