@@ -27,14 +27,15 @@ int main(int argc, char *argv[]) {
     /* After known the number of pids, is time to allocate in memory the PIDS */
     PID_INFO *pids_info = malloc(number_pid * sizeof(PID_INFO));
     
-
     set_pids(argc, argv, pids_info);
 
     fill_pids_information(number_pid, pids_info);
     
+    /* If we have -l command is shown this */
     if (list == 1 && report == 0)
         printf("\n\n--- Informacion recolectada ---");
 
+    /* If we have -r isn't show the information to the user in terminal */
     if (report == 0) {
         for (int i = 0; i < number_pid; i++) {
             printf("\nPID: %s\n", pids_info[i].p_id);
@@ -48,10 +49,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    /* If we have -r command, an output file is created */
     if (report == 1)
         create_file(number_pid, pids_info);
 
-    
+    /* After use the information, deallocates PID information from memory */
     liberate_pids_memory(pids_info, number_pid);
 
 
@@ -147,6 +149,7 @@ void cli(int argc, char *args[]) {
             }
 
         } else {
+            /* To stop the commands' reading */
             break;
         }
     }

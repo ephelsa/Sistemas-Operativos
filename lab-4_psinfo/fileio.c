@@ -4,7 +4,21 @@
 /* Private method declaration */
 /******************************/
 
+/** This method concatenates chars.
+ * @int number of characters to concatenate.
+ * @char*[] characters to concatenate.
+ * 
+ * @return Characters concatenated.
+ */
 char *create_full_name(int, char *[]);
+
+/** This method write inside a file.
+ * @char* This is the file name.
+ * @PID_INFO* PIDS information to write in the file.
+ * @int Number of PIDS.
+ * 
+ * @return void.
+*/
 void write_file(char *, PID_INFO *, int);
 
 
@@ -54,6 +68,7 @@ void write_file(char *fileName, PID_INFO *pids, int number_pid) {
         exit(1);
     }
 
+    /* Information to will be written inside the file */
     for (int i = 0; i < number_pid; i++) {
         fprintf(outFile, "\nPID: %s\n", pids[i].p_id);
         fprintf(outFile, "Nombre del proceso: %s\n", pids[i].name);
@@ -68,6 +83,7 @@ void write_file(char *fileName, PID_INFO *pids, int number_pid) {
     /* To close the file */
     fclose(outFile);
 
+    /* Show to the user when */
     printf("Archivo de salida generado: %s\n", fileName);
 }
 
@@ -122,7 +138,7 @@ void create_file(int pid_array_size, PID_INFO *pids) {
         name[i] = pids[pos].p_id;
     }
 
-
+    /* To write inside the file */
     char *filename = create_full_name(full_name_len, name); 
     write_file(filename, pids, pid_array_size);
 
