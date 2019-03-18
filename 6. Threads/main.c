@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <omp.h>
 
 #include "mfile/mfile.h"
 #include "merror/merror.h"
@@ -31,7 +32,7 @@ int main(int argc, char **argv) {
     PARAMS parameters;
     struct timeval start, end;
 
-    gettimeofday(&start, NULL); // Setting time
+    elapsed_time.settings = omp_get_wtime(); // Setting time
 
     validateParams(argc, argv, &parameters);
 
@@ -43,16 +44,16 @@ int main(int argc, char **argv) {
     setVector(&vector_a, parameters.fn_a, &parameters.size);
     setVector(&vector_b, parameters.fn_b, &parameters.size);
 
-    gettimeofday(&end, NULL);   // Settiing time
-    elapsed_time.settings = (end.tv_sec - start.tv_sec);    // Setting elapsed time
+    elapsed_time.settings = omp_get_wtime() - elapsed_time.settings;    // Setting elapsed time
 
-    gettimeofday(&start, NULL); // Operation time
+    elapsed_time.operations = omp_get_wtime();
     s_multiplication(vector_a, vector_b, &ans, parameters.size);
     
     sum =  s_sum(ans, parameters.size);
     gettimeofday(&end, NULL);   // Operation time
 
-    elapsed_time.operations = (end.tv_sec - start.tv_sec);  // Operation elapsed time
+    elapsed_time.operations = omp_get_wtime() - elapsed_time.operations;
+
 
 
     /* Free memory allocated */
@@ -71,9 +72,10 @@ int main(int argc, char **argv) {
     printf("Size: %d\n", parameters.size);
     printf("Answer: %d\n", sum);
 
-    printf("Settings time: %.2lf\n", elapsed_time.settings);
-    printf("Operation time: %.2lf\n", elapsed_time.operations);
-    printf("Elapsed time: %.2lf\n", (elapsed_time.settings + elapsed_time.operations));
+    printf("Settings time: %lf seconds\n", elapsed_time.settings);
+    printf("Operation time: %lf seconds\n", elapsed_time.operations);
+    printf("Elapsed time: %lf seconds\n", (elapsed_time.settings + elapsed_time.operations));
+
 
     return 0;
 }
