@@ -21,24 +21,27 @@ void setVector(int **vector, char *filename, int *size);
 
 int main(int argc, char **argv) {
 
-    PARAMS *parameters;
-    validateParams(argc, argv, parameters);
+    PARAMS parameters;
+    validateParams(argc, argv, &parameters);
 
     int *vector_a;
     int *vector_b;
     int *ans;
     
-    setVector(&vector_a, parameters->fn_a, &parameters->size);
-    setVector(&vector_b, parameters->fn_b, &parameters->size);
+    setVector(&vector_a, parameters.fn_a, &parameters.size);
+    setVector(&vector_b, parameters.fn_b, &parameters.size);
 
-    s_multiplication(vector_a, vector_b, &ans, parameters->size);
+    s_multiplication(vector_a, vector_b, &ans, parameters.size);
 
     printf("Mul1: %d\n", ans[0]);
     printf("Mul2: %d\n", ans[1]);
     printf("Mul3: %d\n", ans[2]);
 
-    printf("Answer: %d\n", s_sum(ans, parameters->size));
+    printf("Answer: %d\n", s_sum(ans, parameters.size));
 
+    free(vector_a);
+    free(vector_b);
+    free(ans);
     
     return 0;
 }
