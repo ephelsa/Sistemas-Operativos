@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include "mfile/mfile.h"
 #include "merror/merror.h"
@@ -14,6 +15,11 @@ typedef struct exeparams {
     int threads;
 }PARAMS;
 
+typedef struct elapsedtime {
+    float settings;
+    float operations;
+}TIME;
+
 
 void validateParams(int argc, char **argv, PARAMS *parameters);
 void setVector(int **vector, char *filename, int *size);
@@ -21,28 +27,54 @@ void setVector(int **vector, char *filename, int *size);
 
 int main(int argc, char **argv) {
 
+    TIME elapsed_time;
     PARAMS parameters;
+    struct timeval start, end;
+
+    gettimeofday(&start, NULL); // Setting time
+
     validateParams(argc, argv, &parameters);
 
     int *vector_a;
     int *vector_b;
     int *ans;
+    int sum = 0;
     
     setVector(&vector_a, parameters.fn_a, &parameters.size);
     setVector(&vector_b, parameters.fn_b, &parameters.size);
 
+    gettimeofday(&end, NULL);   // Settiing time
+    elapsed_time.settings = (end.tv_sec - start.tv_sec);    // Setting elapsed time
+
+    gettimeofday(&start, NULL); // Operation time
     s_multiplication(vector_a, vector_b, &ans, parameters.size);
+    
+    sum =  s_sum(ans, parameters.size);
+    gettimeofday(&end, NULL);   // Operation time
 
-    printf("Mul1: %d\n", ans[0]);
-    printf("Mul2: %d\n", ans[1]);
-    printf("Mul3: %d\n", ans[2]);
+    elapsed_time.operations = (end.tv_sec - start.tv_sec);  // Operation elapsed time
 
-    printf("Answer: %d\n", s_sum(ans, parameters.size));
 
+    /* Free memory allocated */
     free(vector_a);
     free(vector_b);
     free(ans);
-    
+
+
+
+
+
+
+
+
+
+    printf("Size: %d\n", parameters.size);
+    printf("Answer: %d\n", sum);
+
+    printf("Settings time: %.2lf\n", elapsed_time.settings);
+    printf("Operation time: %.2lf\n", elapsed_time.operations);
+    printf("Elapsed time: %.2lf\n", (elapsed_time.settings + elapsed_time.operations));
+
     return 0;
 }
 

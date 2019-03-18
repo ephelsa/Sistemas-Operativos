@@ -5,7 +5,7 @@
 #include "mfile.h"
 
 /* Total of digits of the number, including sign */
-#define DIGITS 5
+#define DIGITS 8
 
 
 
@@ -62,13 +62,11 @@ void getFileData(FILE **filename, int **vector, int size) {
     char number[DIGITS];
     int counter = 0;
 
-    int *mvector = malloc(sizeof(int) * size);  // Memory separation to vector.
+    int *mvector = calloc(sizeof(int*), size);  // Memory separation to vector.
 
     rewind(*filename);  // Restart file stream, positioning to the begin.
 
     while(fgets(number, sizeof(number), *filename) != NULL){    // Fgets read line by line.
-        printf("%s\n", number);
-
         mvector[counter] = atoi(number);    // Convert the char* to int.
 
         counter++;
@@ -84,15 +82,14 @@ void getFileData(FILE **filename, int **vector, int size) {
 */
 int getFileLines(FILE **filename) {
     char ch;
-    int total = 1;  // Cut 1 iteration by EOF, that's reason to starts at 1.
+    int total = 0;  // At the end of the file MUST have a \n.
 
     rewind(*filename);  // Restart file stream, positioning to the begin.
 
-    while((ch = getw(*filename)) != EOF) {  // Reads only ONE letter line by line.
-        total++;
+    while(!feof(*filename)) {  // End signal.
+        if ((ch = fgetc(*filename)) == '\n')    // Read line by line counting.
+            total++;
     }
-
-    printf("Total lines: %d\n", total);
 
     return total;
 }

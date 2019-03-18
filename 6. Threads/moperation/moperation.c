@@ -5,10 +5,11 @@
 
 
 void s_multiplication(int *v_a, int *v_b, int **ans, int size) {
-    int *mul = malloc(sizeof(int) * size);
+    int *mul = calloc(sizeof(int*), size);
 
     for (int i = 0; i < size; i++) {
         mul[i] = v_a[i] * v_b[i];
+        //printf("%d  \n", mul[i]);
     }
 
     *ans = mul;
