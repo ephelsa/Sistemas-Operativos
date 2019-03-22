@@ -2,13 +2,33 @@
 #define __M_OPERATION__
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
 
-void s_multiplication(int *v_a, int *v_b, int **ans, int size);
-int s_sum(int *vector, int size);
+typedef struct vector_info {
+    double *a;
+    double *b;
+    double sum;
+    int size;
+    int threads;
+} VINFO;
+
+typedef struct thread_args {
+    VINFO *v;
+    int id;
+    int start;
+    int end;
+    pthread_mutex_t *mutex;
+} TH_ARGS;
 
 
-void p_multiplication(int *v_a, int *v_b, int **ans);
-int p_sum(int *vector);
+const VINFO VINFO_INITIALIZER;
+const int STATUS_SUCCESS;
 
+
+void s_operation(VINFO *v);
+void p_operation(TH_ARGS *th_args);
+
+void freeVINFO(VINFO *v);
 
 #endif

@@ -6,7 +6,7 @@
 FILE *openFile(char *filename, char *parameter);
 void closeFile(FILE **file);
 
-void getFileData(FILE **filename, int **vector, int size);
+void getFileData(FILE **filename, double **vector, int size);
 int getFileLines(FILE **filename);
 
 #endif 

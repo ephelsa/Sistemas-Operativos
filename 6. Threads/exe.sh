@@ -1,11 +1,13 @@
-#!/bin/bash
+ #!/bin/bash
 
 clear
 
 echo Script: GCC
-gcc -fopenmp main.c mfile/mfile.c merror/merror.c moperation/moperation.c -o multiplication_s.out -lpthread -Wall
+gcc-8 -fopenmp main.c mfile/mfile.c merror/merror.c moperation/moperation.c -o multiplication_s.out -lpthread -Wall
 
 echo Script: Executing 
 echo ""
 
-./multiplication_s.out "$1" files/a.txt files/b.txt
+./multiplication_s.out "$1" files/vec_10_3_a.txt files/vec_10_3_b.txt 16
+
+#./multiplication_s.out "$1" ../../benchmark/vec_10_8_a.txt ../../benchmark/vec_10_8_b.txt 4

@@ -1,26 +1,35 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "moperation.h"
 
+const VINFO VINFO_INITIALIZER = { NULL, NULL, 0, -1 ,0 };
+const int STATUS_SUCCESS = 10;
 
-void s_multiplication(int *v_a, int *v_b, int **ans, int size) {
-    int *mul = calloc(sizeof(int*), size);
 
-    for (int i = 0; i < size; i++) {
-        mul[i] = v_a[i] * v_b[i];
-        //printf("%d  \n", mul[i]);
-    }
-
-    *ans = mul;
+void s_operation(VINFO *v) {
+    for (int i = 0; i < v->size; i++)
+        v->sum += v->a[i] * v->b[i];
 }
 
-int s_sum(int *vector, int size) {
-    int total_sum = 0;
+void p_operation(TH_ARGS *th_args) {
+    
+    printf("[%d] Executing.\n", th_args->id);
+    
+    double m_sum = 0;
 
-    for(int i = 0; i < size; i++) {
-        total_sum += vector[i];
-    }
+    for (int i = th_args->start; i <= th_args->end; i++)
+        m_sum += th_args->v->a[i] * th_args->v->b[i];
 
-    return total_sum;
+
+    pthread_mutex_lock(th_args->mutex);
+    th_args->v->sum += m_sum;
+    pthread_mutex_unlock(th_args->mutex);
+
+    pthread_exit((void *)(intptr_t)STATUS_SUCCESS);
+}
+
+void freeVINFO(VINFO *v) {
+    free(v->a);
+    free(v->b);
+
+    v->a = NULL;
+    v->b = NULL;
 }

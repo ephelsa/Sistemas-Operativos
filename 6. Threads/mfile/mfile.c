@@ -5,23 +5,11 @@
 #include "mfile.h"
 
 /* Total of digits of the number, including sign */
-#define DIGITS 8
+#define DIGITS  8
 
-
-
+/* Defined by errno library. There is stored errno code by FILE. */
 extern int errno;   // Defined by errno library
 
-/***************************************/
-/*********  PRIVATE METHODS ************/
-/***************************************/
-
-
-
-
-
-/***************************************/
-/**********  PUBLIC METHODS ************/
-/***************************************/
 
 /** This method open the file, doin' validation.
  * 
@@ -58,11 +46,11 @@ void closeFile(FILE **file) {
  *  @params size of vector, is used to reserve memory.
  * 
 */
-void getFileData(FILE **filename, int **vector, int size) {
+void getFileData(FILE **filename, double **vector, int size) {
     char number[DIGITS];
     int counter = 0;
 
-    int *mvector = calloc(sizeof(int*), size);  // Memory separation to vector.
+    double *mvector = calloc(sizeof(double*), size);  // Memory separation to vector.
 
     rewind(*filename);  // Restart file stream, positioning to the begin.
 
