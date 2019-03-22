@@ -109,15 +109,22 @@ void setVector(double **vector, char *filename, int *size) {
 
 // Modificar el start i + loqueseagregue y el end + lo que se agregye
 // verificar con modulos ejem 31 % 16
+// siempre es funcion piso
 
 void parallelOperation(double *elapsed_time, VINFO *v) {
-    *elapsed_time = omp_get_wtime();  // Elapsed time
     pthread_t th_handler[v->threads];
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     void *status;
     TH_ARGS th_args[v->threads];
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-    for (int i = 0; i < v->threads; i++) {
+    
+    *elapsed_time = omp_get_wtime();  // Elapsed time
+
+    int mod = v->size % v->threads;
+    v->size = v->size - mod;
+    printf("Differnce: %d\n", mod);
+
+    for (int i = v->threads - 1; i >= 0; i--) {
         int th;
 
         th_args[i].v = v;
@@ -125,6 +132,12 @@ void parallelOperation(double *elapsed_time, VINFO *v) {
         th_args[i].start = ((v->size * i) / v->threads);
         th_args[i].end = (v->size / v->threads) + th_args[i].start - 1;
         th_args[i].mutex = &mutex;
+
+        if (mod > 0) {
+            th_args[i].start += mod - 1;
+            th_args[i].end += mod;
+            mod--;
+        }
 
         th = pthread_create(&th_handler[i], 
                         NULL, 

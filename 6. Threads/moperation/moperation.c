@@ -9,14 +9,15 @@ void s_operation(VINFO *v) {
         v->sum += v->a[i] * v->b[i];
 }
 
-void p_operation(TH_ARGS *th_args) {
-    
-    printf("[%d] Executing.\n", th_args->id);
-    
+void p_operation(TH_ARGS *th_args) {    
     double m_sum = 0;
 
-    for (int i = th_args->start; i <= th_args->end; i++)
+    /* Size < thread sol  */
+    for (int i = th_args->start; i <= th_args->end; i++) {
         m_sum += th_args->v->a[i] * th_args->v->b[i];
+
+        printf("[%d] Executing -> %f x %f\n", th_args->id, th_args->v->a[i], th_args->v->b[i]);
+    }
 
 
     pthread_mutex_lock(th_args->mutex);
