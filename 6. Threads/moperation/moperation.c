@@ -98,6 +98,9 @@ void p_operation(double *elapsed_time, VINFO *v) {
     /* The different to be assigned in multiples is stored in this var. */
     int diff = v->diff;
 
+    /* It's the portion that correspond to each thread. */
+    int size_per_thread = v->size / v->threads;
+
     /** The assignment of the operations range to each one threads starts since at the end. 
      * This is to solve the parity. */
     for (int i = v->threads - 1; i >= 0; i--) {
@@ -113,7 +116,7 @@ void p_operation(double *elapsed_time, VINFO *v) {
          *       T2.start: 25
          *       T1.start: 0 
         */ 
-        th_args[i].start = ((v->size * i) / v->threads);
+        th_args[i].start = size_per_thread * i;
         
         /** EXPLAIN 2: T ends.
          * 100 assigned to 4 threads (T).
@@ -122,7 +125,7 @@ void p_operation(double *elapsed_time, VINFO *v) {
          *      T2.end: 49
          *      T1.end: 24
         */
-        th_args[i].end = (v->size / v->threads) + th_args[i].start - 1;
+        th_args[i].end = size_per_thread + th_args[i].start - 1;
         th_args[i].mutex = &mutex;
         th_args[i].handler = &th_handler[i];
 
@@ -144,9 +147,9 @@ void p_operation(double *elapsed_time, VINFO *v) {
          * T1: 2
         */
         if (diff > 0) {
-            th_args[i].start += diff - 1;
             th_args[i].end += diff;
             diff--;
+            th_args[i].start += diff;
         }
 
         /* Thread creation. */
