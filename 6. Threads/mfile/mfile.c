@@ -8,15 +8,16 @@
 #define DIGITS  8
 
 /* Defined by errno library. There is stored errno code by FILE. */
-extern int errno;   // Defined by errno library
+extern int errno;
 
 
-/** This method open the file, doin' validation.
+/** 
+ * Purpose: This method open the file, doin' validation.
  * 
- *  @params the name of the file to open.
- *  @params read, write, read and write, trunc, etc.. man fopen
+ * @params the name of the file to open.
+ * @params read, write, read and write, trunc, etc.. man fopen
  * 
- *  @return Pointer to the file opened.
+ * @return Pointer to the file opened.
 **/
 FILE *openFile(char *filename, char *parameter) {
     FILE *mfile = fopen(filename, parameter);
@@ -30,21 +31,26 @@ FILE *openFile(char *filename, char *parameter) {
     }
 }
 
-/** Close an opened file.
+/** 
+ * Purpose: Close an opened file.
  * 
  *  @params pointer to the file.
+ * 
+ * @return void.
 **/
 void closeFile(FILE **file) {
     fclose(*file);
     *file = NULL;
 }
 
-/** Read the file and export the numbers to a vector.
+/** 
+ * Purpose: Read the file and export the numbers to a vector.
  * 
- *  @params pointer to the file.
- *  @params pointer to the vector to save numbers.
- *  @params size of vector, is used to reserve memory.
+ * @params pointer to the file.
+ * @params pointer to the vector to save numbers.
+ * @params size of vector, is used to reserve memory.
  * 
+ * @return void.
 */
 void getFileData(FILE **filename, double **vector, int size) {
     char number[DIGITS];
@@ -63,9 +69,11 @@ void getFileData(FILE **filename, double **vector, int size) {
     *vector = mvector;  // Set the vector's pointer pointing to mvector.
 }
 
-/** Used to know the number of lines in file.
+/** 
+ * Purpose: Used to know the number of lines in file.
  * 
- *  @params Pointer to the file whose number of lines wants be known.
+ * @params Pointer to the file whose number of lines wants be known.
+ *
  *  @return Total lines in file.
 */
 int getFileLines(FILE **filename) {

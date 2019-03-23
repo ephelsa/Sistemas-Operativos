@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include <omp.h>
 
 #include "mfile/mfile.h"
 #include "merror/merror.h"
@@ -10,52 +9,64 @@
 #define SEC 0
 #define PAR 1
 
+/**
+ * Purpose: Store in this data structure the parameters passed though arguments.
+*/
 typedef struct exeparams {
     short type_exe;
+    char *filename;
     char *fn_a;
     char *fn_b;
     int threads;
 }PARAMS;
 
+/**
+ * Purpose: Store in this data structure the time of:
+ *          Setting (parameters validation and set the vectors with data from files).
+ *          Operation (time taken to do the dot product).      
+*/
 typedef struct elapsedtime {
     double settings;
     double operation;
 }TIME;
 
 
-void validateParams(int argc, char **argv, PARAMS *parameters);
-void setVector(double **vector, char *filename, int *size);
-void parallelOperation(double *elapsed_time, VINFO *v);
+/********************/
+/*** Declarations ***/
+/********************/
+void validate_params(int argc, char **argv, PARAMS *parameters);
+void set_vector(double **vector, char *filename, int *size);
+void start(PARAMS p, double *operation_time, VINFO *v);
 
 
+const PARAMS PARAMS_INITIALIZER = { 0, NULL, NULL, NULL, 0 };
+const TIME TIME_INITIALIZER = { 0, 0 };
+
+/* Main method */
 int main(int argc, char **argv) {
-
-    TIME elapsed_time;
-    PARAMS parameters;
+    /* Data structures initialization. */
+    TIME elapsed_time = TIME_INITIALIZER;
+    PARAMS parameters = PARAMS_INITIALIZER;
     VINFO vectors = VINFO_INITIALIZER;
 
-    /* Settings */
+    /* Settings. */
     elapsed_time.settings = omp_get_wtime(); // Setting time
-    validateParams(argc, argv, &parameters);
+    validate_params(argc, argv, &parameters);
     vectors.threads = parameters.threads;
-    setVector(&vectors.a, parameters.fn_a, &vectors.size);
-    setVector(&vectors.b, parameters.fn_b, &vectors.size);
+    set_vector(&vectors.a, parameters.fn_a, &vectors.size);
+    set_vector(&vectors.b, parameters.fn_b, &vectors.size);
     elapsed_time.settings = omp_get_wtime() - elapsed_time.settings;    // Setting elapsed time
 
-    /* Sequential */
-    //elapsed_time.operation = omp_get_wtime();  // Elapsed time
-    //s_operation(&vectors);
-    //elapsed_time.operation = omp_get_wtime() - elapsed_time.operation;    // Operations elpased
+    /* Operations. */
+    start(parameters, &(elapsed_time.operation), &vectors);
 
-    /* Parallel */
-    parallelOperation(&(elapsed_time.operation), &vectors);
-    //pthread_exit(NULL);
+    /* Print the results. */
+    printf("Size: %d\n", vectors.size + vectors.diff);
+    printf("Answer: %lf\n\n", vectors.sum);
 
-    printf("Size: %d\n", vectors.size);
-    printf("Answer: %lf\n", vectors.sum);
-
+    printf("Threads: %d\n", vectors.threads);
     printf("Settings time: %lf seconds\n", elapsed_time.settings);
-    printf("Operation time: %lf\n", elapsed_time.operation);
+    printf("Operation time: %lf seconds\n", elapsed_time.operation);
     printf("Elapsed time: %lf seconds\n", (elapsed_time.settings + elapsed_time.operation));
 
 
@@ -63,35 +74,57 @@ int main(int argc, char **argv) {
     freeVINFO(&vectors);
 
 
-
-
-    return 0;
+    exit(EXIT_SUCCESS);
 }
 
-void validateParams(int argc, char **argv, PARAMS *parameters) {
+/**
+ * Purpose: Validate the parameters and store these in PARAMS structure.
+ * 
+ * @params int number of parameters.
+ * @params char array with parameters.
+ * @params PARAMS data structure to store the information.
+ * 
+ * @return void.
+*/
+void validate_params(int argc, char **argv, PARAMS *parameters) {
+    parameters->filename = argv[0];
+
+    /* Validate the total of parameters. */
     if (argc == 4 || argc == 5) {
+        /* Set if is sequential or parallel. If isn't one of both, shows a error. */
         if (argv[1][0] == 's' || argv[1][0] == 'S') {
             parameters->type_exe = SEC;
         } else if(argv[1][0] == 'p' || argv[1][0] == 'P') {
             parameters->type_exe = PAR;
         }
         else {
-            error_usage(argv[0]);
+            error_usage(parameters->filename);
         }
 
+        /* Store the filesname. */
         parameters->fn_a = argv[2];
         parameters->fn_b = argv[3];
 
+        /* Store the number of threads. */
         if (argc == 5)
             parameters->threads = atoi(argv[4]);
         else
-            parameters->threads = 0;
+            parameters->threads = 1;
     } else {
         error_usage(argv[0]);        
     }
 }
 
-void setVector(double **vector, char *filename, int *size) {
+/**
+ * Purpose: Store a vector array with data from a file.
+ * 
+ * @params double Pointer of vector to store the data.
+ * @params char name of the file that contains the vector.
+ * @params int pointer to store the size the vectors.
+ * 
+ * @return void.
+*/
+void set_vector(double **vector, char *filename, int *size) {
     FILE *fn = openFile(filename, "r");
     int msize = getFileLines(&fn);
 
@@ -99,69 +132,28 @@ void setVector(double **vector, char *filename, int *size) {
 
     closeFile(&fn);
 
-    if (*size != msize && *size != -1)
+    /* If is equals to the default size, that's mean this is the first file analyzed. */
+    if (*size != msize && *size != VINFO_INITIALIZER.size)
         error_vector_diff(*size, msize);
 
+    /* Store in the structure. */
     *size = msize;
 }
 
-/* creation*, joining*, size % threads != 0, size < threads */
-
-// Modificar el start i + loqueseagregue y el end + lo que se agregye
-// verificar con modulos ejem 31 % 16
-// siempre es funcion piso
-
-void parallelOperation(double *elapsed_time, VINFO *v) {
-    pthread_t th_handler[v->threads];
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    void *status;
-    TH_ARGS th_args[v->threads];
-
-    
-    *elapsed_time = omp_get_wtime();  // Elapsed time
-
-    int mod = v->size % v->threads;
-    v->size = v->size - mod;
-    printf("Differnce: %d\n", mod);
-
-    for (int i = v->threads - 1; i >= 0; i--) {
-        int th;
-
-        th_args[i].v = v;
-        th_args[i].id = i;
-        th_args[i].start = ((v->size * i) / v->threads);
-        th_args[i].end = (v->size / v->threads) + th_args[i].start - 1;
-        th_args[i].mutex = &mutex;
-
-        if (mod > 0) {
-            th_args[i].start += mod - 1;
-            th_args[i].end += mod;
-            mod--;
-        }
-
-        th = pthread_create(&th_handler[i], 
-                        NULL, 
-                        (void *) p_operation, 
-                        (void *) &th_args[i]);
-
-        if (th != 0) 
-            error_thread_create(th_args[i].id);
-
-
-        printf("[%d] Start: %d - End: %d\n", i, th_args[i].start, th_args[i].end);
-    }
-
-    for (int i = 0; i < v->threads; i++) {
-        int th = pthread_join(th_handler[i], &status);
-
-        if (th != 0)
-            error_thread_join((intptr_t)status, th_args[i].id);
-
-
-        printf("Thread [%d] - Status %ld\n", th_args[i].id, (intptr_t)status);
-    }
-    *elapsed_time = omp_get_wtime() - *(elapsed_time);    // Operations elpased
-
-
-    pthread_mutex_destroy(&mutex);
+/**
+ * Purpose: Start the operation by validating if it is sequential or parallel.
+ * 
+ * @params PARAMS to know the execution type.
+ * @params double Pointer to store the operation time.
+ * @params VINFO to know the vector information and store the dot product.
+ * 
+ * @return void.
+*/
+void start(PARAMS p, double *operation_time, VINFO *v) {
+    if (p.type_exe == SEC) 
+        s_operation(operation_time, v);
+    else if (p.type_exe == PAR)
+        p_operation(operation_time, v);
+    else
+        error_usage(p.filename);
 }

@@ -3,6 +3,10 @@
 
 #include <stdlib.h>
 
+/*******************************************/
+/* Purpose: Manipulate files and his data. */
+/*******************************************/
+
 FILE *openFile(char *filename, char *parameter);
 void closeFile(FILE **file);
 
