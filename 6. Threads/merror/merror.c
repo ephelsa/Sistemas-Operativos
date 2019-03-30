@@ -89,3 +89,21 @@ void error_thread_mutex(int error) {
 
     exit(EXIT_FAILURE);
 }
+
+/**
+ * Purpose: Show in screen a warning related with a bad perfomance by overheap.
+ * 
+ * @param int number of threads.
+ * @param int size of vectors.
+ * 
+ * @return void.
+*/
+
+void warning_threads_greater_size(int n_thread, int size) {
+    int used = size % n_thread;
+    int useless = n_thread - used;
+
+    printf("Warning: The number of threads are greater than vectors' size.\n");
+    printf("The program will continue. But with a bad perfomance.\n\n");
+    printf("Only %d threads will be used, the rest (%d) will not do anything.\n", used, useless);
+}

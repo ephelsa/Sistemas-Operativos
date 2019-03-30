@@ -15,4 +15,7 @@ void error_thread_create(int id, int error);
 void error_thread_join(int status, int id, int error);
 void error_thread_mutex(int error);
 
+void warning_threads_greater_size(int n_thread, int size);
+
+
 #endif

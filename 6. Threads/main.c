@@ -152,8 +152,12 @@ void set_vector(double **vector, char *filename, int *size) {
 void start(PARAMS p, double *operation_time, VINFO *v) {
     if (p.type_exe == SEC) 
         s_operation(operation_time, v);
-    else if (p.type_exe == PAR)
+    else if (p.type_exe == PAR) {
+        if (v->size < p.threads)
+            warning_threads_greater_size(p.threads, v->size);
+
         p_operation(operation_time, v);
-    else
+        
+    } else
         error_usage(p.filename);
 }

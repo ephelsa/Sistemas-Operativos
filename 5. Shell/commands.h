@@ -1,12 +1,12 @@
-//
-//  commands.h
-//  
-//
-//  Created by Leonardo Pérez Castilla on 3/2/19.
-//
+#ifndef COMMANDS_H
+#define COMMANDS_H
 
-#ifndef commands_h
-#define commands_h
+void udea_pwd(); // Current folder
+void udea_cd(char *); // Change folder
+void udea_echo(int, char **);    // Message
+void udea_clr(); // Clear promt
+void udea_time();    // Show current time
+void udea_exit();    // Close the promt
 
 
 #endif /* commands_h */
