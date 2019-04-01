@@ -61,13 +61,18 @@ int main(int argc, char **argv) {
     start(parameters, &(elapsed_time.operation), &vectors);
 
     /* Print the results. */
+    
     printf("Size: %d\n", vectors.size + vectors.diff);
     printf("Answer: %lf\n\n", vectors.sum);
 
-    printf("Threads: %d\n", vectors.threads);
-    printf("Settings time: %lf seconds\n", elapsed_time.settings);
-    printf("Operation time: %lf seconds\n", elapsed_time.operation);
-    printf("Elapsed time: %lf seconds\n", (elapsed_time.settings + elapsed_time.operation));
+    printf("Threads: %d.\n", vectors.threads);
+    printf("Settings time: %lf seconds.\n", elapsed_time.settings);
+    printf("Operation time: %lf seconds.\n", elapsed_time.operation);
+    printf("Elapsed time: %lf seconds.\n", (elapsed_time.settings + elapsed_time.operation));
+    
+
+    /* Results other type. */
+    //printf("%lf\n", elapsed_time.operation);
 
 
     /* Free memory allocated */
